@@ -2,7 +2,6 @@
 
 namespace Jenky\GateKeeper;
 
-use Illuminate\Contracts\Validation\Factory;
 use Jenky\GateKeeper\Exceptions\GateKeeperException;
 
 trait SelfValidates
@@ -10,14 +9,14 @@ trait SelfValidates
     /**
      * The gate keeper object.
      *
-     * @var GateKeeper
+     * @var \Jenky\GateKeeper\GateKeeper
      */
     protected $gateKeeperInstance;
 
     /**
      * Current context.
      *
-     * @var string
+     * @var string|array
      */
     protected $currenctContext;
 
@@ -41,8 +40,8 @@ trait SelfValidates
     /**
      * Get the gate keeper instance.
      *
-     * @return GateKeeper
-     * @throws Exceptions\GateKeeperException
+     * @throws \Jenky\GateKeeper\Exceptions\GateKeeperException
+     * @return \Jenky\GateKeeper\GateKeeper
      */
     public function gateKeeper()
     {
@@ -66,7 +65,7 @@ trait SelfValidates
     /**
      * Set the gate keeper instance.
      *
-     * @param  GateKeeper $gateKeeper
+     * @param  \Jenky\GateKeeper\GateKeeper $gateKeeper
      * @return $this
      */
     public function setGateKeeper(GateKeeper $gateKeeper)
@@ -87,9 +86,8 @@ trait SelfValidates
             return;
         }
 
-        $rules = $this->gateKeeper()->getRules($this->context);
-
-        dd($rules);
+        $validator = $this->gateKeeper()->getValidatorInstance($this->currenctContext);
+        dd($validator);
 
         throw new \Exception('Validation failed.');
     }
@@ -97,9 +95,9 @@ trait SelfValidates
     /**
      * Validate the given data with the given rules.
      *
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array $rules
+     * @param  array $messages
+     * @param  array $customAttributes
      * @return array
      */
     public function validateWith(array $rules, array $messages = [], array $customAttributes = [])
@@ -127,7 +125,7 @@ trait SelfValidates
     /**
      * Register a validating model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string $callback
      * @return void
      */
     public static function validating($callback)
@@ -138,7 +136,7 @@ trait SelfValidates
     /**
      * Register a validated model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string $callback
      * @return void
      */
     public static function validated($callback)
@@ -149,23 +147,13 @@ trait SelfValidates
     /**
      * Set current context.
      *
-     * @param  string $context
+     * @param  mixed $keys
      * @return $this
      */
-    public function onContext($key)
+    public function onContext($keys)
     {
-        $this->currentContext = is_array($key) ? $key : func_get_args();
+        $this->currentContext = is_array($keys) ? $keys : func_get_args();
 
         return $this;
-    }
-
-    /**
-     * Get a validation factory instance.
-     *
-     * @return \Illuminate\Contracts\Validation\Factory
-     */
-    protected function getValidationFactory()
-    {
-        return app(Factory::class);
     }
 }

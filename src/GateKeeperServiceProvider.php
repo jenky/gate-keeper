@@ -13,7 +13,7 @@ class GateKeeperServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        \App\User::observe(GateKeeperObserver::class);
+        //
     }
 
     /**
